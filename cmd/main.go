@@ -3,35 +3,65 @@ package main
 import (
 	. "FirstAPI"
 	FirstAPI "FirstAPI/db"
-	"fmt"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 	"net/http"
 	"strconv"
 )
 
 func main() {
 
+	// connect to DB
 	db := FirstAPI.Init()
 	err := db.AutoMigrate(&User{}, &Msg{})
 	if err != nil {
 		return
 	}
-	var users []User
-	db.Find(&users)
-
-	fmt.Println(users)
 
 	router := gin.Default()
 
+	/* API for messages */
 	// get all messages
-	router.GET("/messages", func(c *gin.Context) {
+	router.GET("/messages", GetAllMessages(db))
+
+	// send new message
+	router.POST("/messages", SendMessage(db))
+
+	// get all messages to user with specified ID
+	router.GET("/messages/:id", GetAllMessagesToUser(db))
+
+	// delete message by ID
+	router.DELETE("/messages/:id", DeleteMessage(db))
+
+	// update message by ID
+	router.PUT("/messages/:id", UpdateMessage(db))
+
+	/*   API for users   */
+	// get all users
+	router.GET("/users", GetAllUsers(db))
+
+	// create new user
+	router.POST("/users", CreateUser(db))
+
+	// delete user by ID
+	router.DELETE("/users/:id", DeleteUser(db))
+
+	// update user name
+	router.PUT("/users/:id", UpdateUser(db))
+
+	router.Run("localhost:8000")
+}
+
+func GetAllMessages(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
 		var messagesFromBd []Msg
 		db.Find(&messagesFromBd)
 		c.IndentedJSON(http.StatusOK, messagesFromBd)
-	})
+	}
+}
 
-	// send new message
-	router.POST("/messages", func(c *gin.Context) {
+func SendMessage(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
 		var newMsg Msg
 		if err := c.BindJSON(&newMsg); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -39,10 +69,11 @@ func main() {
 		}
 		db.Create(&newMsg)
 		c.IndentedJSON(http.StatusOK, newMsg)
-	})
+	}
+}
 
-	// get all messages to user with specified ID
-	router.GET("/messages/:id", func(c *gin.Context) {
+func GetAllMessagesToUser(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
 		id, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -55,10 +86,11 @@ func main() {
 			return
 		}
 		c.IndentedJSON(http.StatusOK, msgs)
-	})
+	}
+}
 
-	// delete message by ID
-	router.DELETE("/messages/:id", func(c *gin.Context) {
+func DeleteMessage(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
 		id, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -68,10 +100,11 @@ func main() {
 		db.First(&msg, id)
 		db.Delete(&msg, id)
 		c.IndentedJSON(http.StatusOK, msg)
-	})
+	}
+}
 
-	// update message by ID
-	router.PUT("/messages/:id", func(c *gin.Context) {
+func UpdateMessage(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
 		id, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error: ": err.Error()})
@@ -88,19 +121,20 @@ func main() {
 		c.IndentedJSON(http.StatusOK, newMsg)
 		return
 
-	})
+	}
+}
 
-	/*   API for users   */
-
-	// get all users
-	router.GET("/users", func(c *gin.Context) {
+/* Hanlders for users: */
+func GetAllUsers(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
 		var users []User
 		db.Find(&users)
 		c.IndentedJSON(http.StatusOK, users)
-	})
+	}
+}
 
-	// create new user
-	router.POST("/users", func(c *gin.Context) {
+func CreateUser(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
 		var newUsr User
 		if err := c.BindJSON(&newUsr); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -108,10 +142,11 @@ func main() {
 		}
 		db.Create(&newUsr)
 		c.IndentedJSON(http.StatusOK, newUsr)
-	})
+	}
+}
 
-	// delete user by ID
-	router.DELETE("/users/:id", func(c *gin.Context) {
+func DeleteUser(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
 		id, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -121,10 +156,11 @@ func main() {
 		db.First(&usr, id)
 		db.Delete(&usr, id)
 		c.IndentedJSON(http.StatusOK, usr)
-	})
+	}
+}
 
-	// update user name
-	router.PUT("/users/:id", func(c *gin.Context) {
+func UpdateUser(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
 		id, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error: ": err.Error()})
@@ -140,6 +176,5 @@ func main() {
 		db.Model(&userBeforeEditing).Update("name", newUsr.Name)
 		c.IndentedJSON(http.StatusOK, newUsr)
 		return
-	})
-	router.Run("localhost:8000")
+	}
 }

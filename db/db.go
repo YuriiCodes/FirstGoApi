@@ -1,4 +1,4 @@
-package FirstAPI
+package db
 
 import (
 	"gorm.io/driver/postgres"

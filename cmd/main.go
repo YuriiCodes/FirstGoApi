@@ -1,8 +1,10 @@
 package main
 
 import (
+	// structures for User and Message
 	. "FirstAPI"
-	FirstAPI "FirstAPI/db"
+
+	. "FirstAPI/db"
 	. "FirstAPI/handlers"
 	"github.com/gin-gonic/gin"
 )
@@ -10,7 +12,7 @@ import (
 func main() {
 
 	// connect to DB
-	db := FirstAPI.Init()
+	db := Init()
 	err := db.AutoMigrate(&User{}, &Msg{})
 	if err != nil {
 		return

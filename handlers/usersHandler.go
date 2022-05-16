@@ -2,6 +2,7 @@ package handlers
 
 import (
 	. "FirstAPI"
+	. "FirstAPI/models"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"net/http"
@@ -11,8 +12,7 @@ import (
 /* Hanlders for users: */
 func GetAllUsers(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var users []User
-		db.Find(&users)
+		users, _ := GetAllUsersFromDb(db)
 		c.IndentedJSON(http.StatusOK, users)
 	}
 }
@@ -24,7 +24,7 @@ func CreateUser(db *gorm.DB) gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		db.Create(&newUsr)
+		CreateUserInDB(db, newUsr)
 		c.IndentedJSON(http.StatusOK, newUsr)
 	}
 }
@@ -36,9 +36,7 @@ func DeleteUser(db *gorm.DB) gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		var usr User
-		db.First(&usr, id)
-		db.Delete(&usr, id)
+		usr, _ := DeleteUserFromDb(db, id)
 		c.IndentedJSON(http.StatusOK, usr)
 	}
 }
@@ -55,10 +53,8 @@ func UpdateUser(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		var userBeforeEditing User
-		db.First(&userBeforeEditing, id)
-		db.Model(&userBeforeEditing).Update("name", newUsr.Name)
-		c.IndentedJSON(http.StatusOK, newUsr)
+		userAfterEditing, _ := UpdateUserInDb(db, id, newUsr)
+		c.IndentedJSON(http.StatusOK, userAfterEditing)
 		return
 	}
 }

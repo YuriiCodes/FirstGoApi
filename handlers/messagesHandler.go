@@ -2,6 +2,7 @@ package handlers
 
 import (
 	. "FirstAPI"
+	. "FirstAPI/models"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"net/http"
@@ -10,8 +11,7 @@ import (
 
 func GetAllMessages(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var messagesFromBd []Msg
-		db.Find(&messagesFromBd)
+		messagesFromBd, _ := GetAllMessagesFromDb(db)
 		c.IndentedJSON(http.StatusOK, messagesFromBd)
 	}
 }
@@ -23,7 +23,7 @@ func SendMessage(db *gorm.DB) gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		db.Create(&newMsg)
+		SendMessageToDb(db, newMsg)
 		c.IndentedJSON(http.StatusOK, newMsg)
 	}
 }
@@ -35,26 +35,24 @@ func GetAllMessagesToUser(db *gorm.DB) gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		var msgs []Msg
-		db.Where("sender_id <> ?", id).Find(&msgs)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
+
+		msgs, _ := GetAllMessagesToUserFromDb(db, id)
+
 		c.IndentedJSON(http.StatusOK, msgs)
 	}
 }
 
 func DeleteMessage(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
+
 		id, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		var msg Msg
-		db.First(&msg, id)
-		db.Delete(&msg, id)
+
+		msg, _ := DeleteMessageFromDb(db, id)
+
 		c.IndentedJSON(http.StatusOK, msg)
 	}
 }
@@ -71,10 +69,9 @@ func UpdateMessage(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		var msg Msg
-		db.First(&msg, id)
-		db.Model(&msg).Update("message", newMsg.Message)
-		c.IndentedJSON(http.StatusOK, newMsg)
+		msg, _ := UpdateMessageInDb(db, id, newMsg)
+
+		c.IndentedJSON(http.StatusOK, msg)
 		return
 
 	}

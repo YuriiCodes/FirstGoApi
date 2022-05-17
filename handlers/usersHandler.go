@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	. "FirstAPI"
+	. "FirstAPI/dbAPI"
 	. "FirstAPI/models"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"

@@ -1,4 +1,4 @@
-package FirstAPI
+package models
 
 type Msg struct {
 	Id         int    `json:"id"  gorm:"primaryKey`

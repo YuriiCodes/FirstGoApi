@@ -1,8 +1,7 @@
 package main
 
 import (
-	// structures for User and Message
-	. "FirstAPI"
+	. "FirstAPI/models"
 
 	. "FirstAPI/db"
 	. "FirstAPI/handlers"

@@ -1,7 +1,7 @@
-package models
+package dbAPI
 
 import (
-	. "FirstAPI"
+	. "FirstAPI/models"
 	"gorm.io/gorm"
 )
 

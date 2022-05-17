@@ -12,7 +12,7 @@ import (
 func GetAllMessages(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		messagesFromBd, _ := GetAllMessagesFromDb(db)
-		c.IndentedJSON(http.StatusOK, messagesFromBd)
+		c.JSON(http.StatusOK, messagesFromBd)
 	}
 }
 
@@ -24,7 +24,7 @@ func SendMessage(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 		SendMessageToDb(db, newMsg)
-		c.IndentedJSON(http.StatusOK, newMsg)
+		c.JSON(http.StatusOK, newMsg)
 	}
 }
 
@@ -38,7 +38,7 @@ func GetAllMessagesToUser(db *gorm.DB) gin.HandlerFunc {
 
 		msgs, _ := GetAllMessagesToUserFromDb(db, id)
 
-		c.IndentedJSON(http.StatusOK, msgs)
+		c.JSON(http.StatusOK, msgs)
 	}
 }
 
@@ -53,7 +53,7 @@ func DeleteMessage(db *gorm.DB) gin.HandlerFunc {
 
 		msg, _ := DeleteMessageFromDb(db, id)
 
-		c.IndentedJSON(http.StatusOK, msg)
+		c.JSON(http.StatusOK, msg)
 	}
 }
 
@@ -71,7 +71,7 @@ func UpdateMessage(db *gorm.DB) gin.HandlerFunc {
 
 		msg, _ := UpdateMessageInDb(db, id, newMsg)
 
-		c.IndentedJSON(http.StatusOK, msg)
+		c.JSON(http.StatusOK, msg)
 		return
 
 	}

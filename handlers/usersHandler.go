@@ -13,7 +13,7 @@ import (
 func GetAllUsers(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		users, _ := GetAllUsersFromDb(db)
-		c.IndentedJSON(http.StatusOK, users)
+		c.JSON(http.StatusOK, users)
 	}
 }
 
@@ -25,7 +25,7 @@ func CreateUser(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 		CreateUserInDB(db, newUsr)
-		c.IndentedJSON(http.StatusOK, newUsr)
+		c.JSON(http.StatusOK, newUsr)
 	}
 }
 
@@ -37,7 +37,7 @@ func DeleteUser(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 		usr, _ := DeleteUserFromDb(db, id)
-		c.IndentedJSON(http.StatusOK, usr)
+		c.JSON(http.StatusOK, usr)
 	}
 }
 
@@ -54,7 +54,7 @@ func UpdateUser(db *gorm.DB) gin.HandlerFunc {
 		}
 
 		userAfterEditing, _ := UpdateUserInDb(db, id, newUsr)
-		c.IndentedJSON(http.StatusOK, userAfterEditing)
+		c.JSON(http.StatusOK, userAfterEditing)
 		return
 	}
 }

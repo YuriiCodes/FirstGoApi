@@ -12,7 +12,11 @@ import (
 /* Hanlders for users: */
 func GetAllUsers(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		users, _ := GetAllUsersFromDb(db)
+		users, err := GetAllUsersFromDb(db)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
 		c.JSON(http.StatusOK, users)
 	}
 }
@@ -24,7 +28,11 @@ func CreateUser(db *gorm.DB) gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		CreateUserInDB(db, newUsr)
+		err := CreateUserInDB(db, newUsr)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
 		c.JSON(http.StatusOK, newUsr)
 	}
 }
@@ -36,7 +44,11 @@ func DeleteUser(db *gorm.DB) gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		usr, _ := DeleteUserFromDb(db, id)
+		usr, err := DeleteUserFromDb(db, id)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
 		c.JSON(http.StatusOK, usr)
 	}
 }
@@ -53,7 +65,11 @@ func UpdateUser(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		userAfterEditing, _ := UpdateUserInDb(db, id, newUsr)
+		userAfterEditing, err := UpdateUserInDb(db, id, newUsr)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
 		c.JSON(http.StatusOK, userAfterEditing)
 		return
 	}

@@ -11,7 +11,11 @@ import (
 
 func GetAllMessages(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		messagesFromBd, _ := GetAllMessagesFromDb(db)
+		messagesFromBd, err := GetAllMessagesFromDb(db)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
 		c.JSON(http.StatusOK, messagesFromBd)
 	}
 }
@@ -23,7 +27,11 @@ func SendMessage(db *gorm.DB) gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		SendMessageToDb(db, newMsg)
+		err := SendMessageToDb(db, newMsg);
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
 		c.JSON(http.StatusOK, newMsg)
 	}
 }
@@ -36,7 +44,11 @@ func GetAllMessagesToUser(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		msgs, _ := GetAllMessagesToUserFromDb(db, id)
+		msgs, err := GetAllMessagesToUserFromDb(db, id)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
 
 		c.JSON(http.StatusOK, msgs)
 	}
@@ -51,7 +63,12 @@ func DeleteMessage(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		msg, _ := DeleteMessageFromDb(db, id)
+		msg, err := DeleteMessageFromDb(db, id)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
 
 		c.JSON(http.StatusOK, msg)
 	}
@@ -69,7 +86,12 @@ func UpdateMessage(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		msg, _ := UpdateMessageInDb(db, id, newMsg)
+		msg, err := UpdateMessageInDb(db, id, newMsg)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
 
 		c.JSON(http.StatusOK, msg)
 		return

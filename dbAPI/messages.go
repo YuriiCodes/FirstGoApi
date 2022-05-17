@@ -7,31 +7,49 @@ import (
 
 func GetAllMessagesFromDb(db *gorm.DB) ([]Msg, error) {
 	var messages []Msg
-	db.Find(&messages)
+
+	if err := db.Find(&messages).Error; err != nil {
+		return nil, err
+	}
 	return messages, nil
 }
 
 func SendMessageToDb(db *gorm.DB, msg Msg) error {
-	db.Create(&msg)
+	if err := db.Create(&msg).Error; err != nil {
+		return err
+	}
 	return nil
 }
 
 func GetAllMessagesToUserFromDb(db *gorm.DB, userID int) ([]Msg, error) {
 	var msgs []Msg
-	db.Where("sender_id <> ?", userID).Find(&msgs)
+	if err := db.Where("sender_id <> ?", userID).Find(&msgs).Error; err != nil {
+		return nil, err
+	}
 	return msgs, nil
 }
 
 func DeleteMessageFromDb(db *gorm.DB, msgID int) (Msg, error) {
 	var msg Msg
-	db.First(&msg, msgID)
-	db.Delete(&msg, msgID)
+	if err := db.First(&msg, msgID).Error; err != nil {
+		return msg, err
+	}
+
+	if err := db.Delete(&msg, msgID).Error; err != nil {
+		return msg, err
+	}
 	return msg, nil
 }
 
 func UpdateMessageInDb(db *gorm.DB, messageID int, editedMessage Msg) (Msg, error) {
 	var msg Msg
-	db.First(&msg, messageID)
-	db.Model(&msg).Update("message", editedMessage.Message)
+
+	if err := db.First(&msg, messageID).Error; err != nil {
+		return msg, err
+	}
+
+	if err := db.Model(&msg).Update("message", editedMessage.Message).Error; err != nil {
+		return msg, err
+	}
 	return msg, nil
 }

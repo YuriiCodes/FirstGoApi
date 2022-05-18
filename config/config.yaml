@@ -1,0 +1,5 @@
+server:
+  host: "localhost"
+  port: "8000"
+database:
+  url: "postgres://postgres:qwerty@localhost:5436/postgres?sslmode=disable"

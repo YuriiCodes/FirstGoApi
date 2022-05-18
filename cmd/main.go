@@ -2,6 +2,7 @@ package main
 
 import (
 	. "FirstAPI/models"
+	"github.com/spf13/viper"
 
 	. "FirstAPI/db"
 	. "FirstAPI/handlers"
@@ -10,9 +11,20 @@ import (
 
 func main() {
 
+	viper.AddConfigPath("config")
+	viper.SetConfigName("config")
+	viper.SetConfigType("yaml")
+	err := viper.ReadInConfig()
+	if err != nil {
+		panic(err)
+	}
+	serverHost := viper.GetString("server.host")
+	serverPort := viper.GetString("server.port")
+	dbUrl := viper.GetString("database.url")
+
 	// connect to DB
-	db := Init()
-	err := db.AutoMigrate(&User{}, &Msg{})
+	db := Init(dbUrl)
+	err = db.AutoMigrate(&User{}, &Msg{})
 	if err != nil {
 		return
 	}
@@ -48,5 +60,5 @@ func main() {
 	// update user name
 	router.PUT("/users/:id", UpdateUser(db))
 
-	router.Run("localhost:8000")
+	router.Run(serverHost + ":" + serverPort)
 }

@@ -5,8 +5,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func Init() *gorm.DB {
-	dbUrl := "postgres://postgres:qwerty@localhost:5436/postgres?sslmode=disable"
+func Init(dbUrl string) *gorm.DB {
 
 	db, err := gorm.Open(postgres.Open(dbUrl), &gorm.Config{})
 
